@@ -35,18 +35,15 @@ spec:
           name: ${{ parameters.name }}
           email: ${{ parameters.email }}
 
-    - id: push-to-repo
-      name: Push directly to existing repo
-      action: github:repo:push           # ✅ Correct action name
+   - id: publish-to-github
+      name: Publish to GitHub
+      action: github:repo:push
       input:
         repoUrl: github.com?owner=Souvik4002&repo=Basic-Programme
-        branch: main
-        targetPath: '.'
-        message: "Pushed by Backstage template for ${{ parameters.email }}"
-        author:
-          name: Backstage Bot
-          email: backstage@example.com
-        force: true                 # ✅ Use force to avoid fast-forward errors
+        defaultBranch: main
+        sourcePath: "."
+        gitCommitMessage: ${{ parameters.comments }}
+        force: true             # ✅ Use force to avoid fast-forward errors
 
     - id: register
       name: Register Component
