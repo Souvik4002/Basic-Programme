@@ -37,7 +37,7 @@ spec:
 
     - id: push-to-repo
       name: Push directly to existing repo
-      action:  github:repo:push
+      action: github:repo:push           # ✅ Correct action name
       input:
         repoUrl: github.com?owner=Souvik4002&repo=Basic-Programme
         branch: main
@@ -46,7 +46,7 @@ spec:
         author:
           name: Backstage Bot
           email: backstage@example.com
-        overwrite: true
+        force: true                 # ✅ Use force to avoid fast-forward errors
 
     - id: register
       name: Register Component
