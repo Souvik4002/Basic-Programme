@@ -1,9 +1,9 @@
 apiVersion: scaffolder.backstage.io/v1beta3
 kind: Template
 metadata:
-  name: example-nodejs-template
+  name: souvik
   title: Example Node.js Template
-  description: A template that scaffolds a simple Node.js service and pushes it to a specific GitHub repo
+  description: A template
 spec:
   owner: user:guest
   type: service
