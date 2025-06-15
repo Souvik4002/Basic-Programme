@@ -41,7 +41,7 @@ spec:
       input:
         allowedHosts: ['github.com']
         description: Service created by ${{ parameters.email }}
-        repoUrl: github.com/Souvik4002/Basic-Programme/${{ parameters.name }}
+        repoUrl: https://github.com/Souvik4002/Basic-Programme.git
         defaultBranch: main
 
     - id: register
