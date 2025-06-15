@@ -35,28 +35,30 @@ spec:
           name: ${{ parameters.name }}
           email: ${{ parameters.email }}
 
-    - id: publish
-      name: Push to existing GitHub repo
-      action: publish:github:pull-request
+    - id: push-to-repo
+      name: Push directly to existing repo
+      action: github:push
       input:
         repoUrl: github.com?owner=Souvik4002&repo=Basic-Programme
-        branchName: main
-        title: "Update from Backstage Template"
-        description: "Added new component by ${{ parameters.email }}"
+        branch: main
         targetPath: '.'
+        message: "Pushed by Backstage template for ${{ parameters.email }}"
+        author:
+          name: Backstage Bot
+          email: backstage@example.com
         overwrite: true
 
     - id: register
       name: Register Component
       action: catalog:register
       input:
-        repoContentsUrl: ${{ steps['publish'].output.repoContentsUrl }}
+        repoContentsUrl: ${{ steps['push-to-repo'].output.repoContentsUrl }}
         catalogInfoPath: '/catalog-info.yaml'
 
   output:
     links:
-      - title: View Pull Request or Branch
-        url: ${{ steps['publish'].output.remoteUrl }}
+      - title: View Repository
+        url: ${{ steps['push-to-repo'].output.remoteUrl }}
       - title: Open in Catalog
         icon: catalog
         entityRef: ${{ steps['register'].output.entityRef }}
