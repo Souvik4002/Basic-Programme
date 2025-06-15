@@ -1,77 +1,60 @@
 apiVersion: scaffolder.backstage.io/v1beta3
-# https://backstage.io/docs/features/software-catalog/descriptor-format#kind-template
 kind: Template
 metadata:
   name: example-nodejs-template
   title: Example Node.js Template
-  description: An example template for the scaffolder that creates a simple Node.js service
+  description: A template that scaffolds a simple Node.js service and pushes it to a specific GitHub repo
 spec:
   owner: user:guest
   type: service
 
-  # These parameters are used to generate the input form in the frontend, and are
-  # used to gather input data for the execution of the template.
   parameters:
-    - title: Fill in some steps
+    - title: Provide details
       required:
         - name
+        - email
       properties:
         name:
-          title: Name
+          title: Component Name
           type: string
           description: Unique name of the component
           ui:autofocus: true
-          ui:options:
-            rows: 5
-    - title: Choose a location
-      required:
-        - repoUrl
-      properties:
-        repoUrl:
-          title: Repository Location
+        email:
+          title: User Email
           type: string
-          ui:field: RepoUrlPicker
-          ui:options:
-            allowedHosts:
-              - github.com
+          format: email
+          description: Your email for tracking
 
-  # These steps are executed in the scaffolder backend, using data that we gathered
-  # via the parameters above.
   steps:
-    # Each step executes an action, in this case one templates files into the working directory.
     - id: fetch-base
-      name: Fetch Base
+      name: Fetch Template Base
       action: fetch:template
       input:
         url: ./content
         values:
           name: ${{ parameters.name }}
+          email: ${{ parameters.email }}
 
-    # This step publishes the contents of the working directory to GitHub.
-    # If you or your organization prefer another default branch name over 'main'
-    # you can change that here.
     - id: publish
-      name: Publish
+      name: Publish to GitHub
       action: publish:github
       input:
         allowedHosts: ['github.com']
-        description: This is ${{ parameters.name }}
-        repoUrl: ${{ parameters.repoUrl }}
-        defaultBranch: 'main'
+        description: Service created by ${{ parameters.email }}
+        repoUrl: github.com/Souvik4002/Basic-Programme/${{ parameters.name }}
+        defaultBranch: main
 
-    # The final step is to register our new component in the catalog.
     - id: register
-      name: Register
+      name: Register Component
       action: catalog:register
       input:
         repoContentsUrl: ${{ steps['publish'].output.repoContentsUrl }}
         catalogInfoPath: '/catalog-info.yaml'
 
-  # Outputs are displayed to the user after a successful execution of the template.
   output:
     links:
-      - title: Repository
+      - title: View Repository
         url: ${{ steps['publish'].output.remoteUrl }}
-      - title: Open in catalog
+      - title: Open in Catalog
         icon: catalog
         entityRef: ${{ steps['register'].output.entityRef }}
