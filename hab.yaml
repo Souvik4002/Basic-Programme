@@ -1,0 +1,60 @@
+apiVersion: scaffolder.backstage.io/v1beta3
+kind: Template
+metadata:
+  name: souvik
+  title: Example Node.js Template
+  description: A template
+spec:
+  owner: user:guest
+  type: service
+
+  parameters:
+    - title: Provide details
+      required:
+        - name
+        - email
+      properties:
+        name:
+          title: Component Name
+          type: string
+          description: Unique name of the component
+          ui:autofocus: true
+        email:
+          title: User Email
+          type: string
+          format: email
+          description: Your email for tracking
+
+  steps:
+    - id: fetch-base
+      name: Fetch Template Base
+      action: fetch:template
+      input:
+        url: ./content
+        values:
+          name: ${{ parameters.name }}
+          email: ${{ parameters.email }}
+
+    - id: publish
+      name: Publish to GitHub
+      action: publish:github
+      input:
+        allowedHosts: ['github.com']
+        description: Service created by ${{ parameters.email }}
+        repoUrl: github.com/Souvik4002/Basic-Programme
+        defaultBranch: main
+
+    - id: register
+      name: Register Component
+      action: catalog:register
+      input:
+        repoContentsUrl: ${{ steps['publish'].output.repoContentsUrl }}
+        catalogInfoPath: '/catalog-info.yaml'
+
+  output:
+    links:
+      - title: View Repository
+        url: ${{ steps['publish'].output.remoteUrl }}
+      - title: Open in Catalog
+        icon: catalog
+        entityRef: ${{ steps['register'].output.entityRef }}
