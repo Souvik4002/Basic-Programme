@@ -13,6 +13,7 @@ spec:
       required:
         - name
         - email
+        - comments
       properties:
         name:
           title: Component Name
@@ -24,6 +25,10 @@ spec:
           type: string
           format: email
           description: Your email for tracking
+        comments:
+          title: Commit Message
+          type: string
+          description: Message to use in the Git commit
 
   steps:
     - id: fetch-base
@@ -35,7 +40,7 @@ spec:
           name: ${{ parameters.name }}
           email: ${{ parameters.email }}
 
-   - id: publish-to-github
+    - id: publish-to-github
       name: Publish to GitHub
       action: github:repo:push
       input:
@@ -43,19 +48,19 @@ spec:
         defaultBranch: main
         sourcePath: "."
         gitCommitMessage: ${{ parameters.comments }}
-        force: true             # ✅ Use force to avoid fast-forward errors
+        force: true
 
     - id: register
       name: Register Component
       action: catalog:register
       input:
-        repoContentsUrl: ${{ steps['push-to-repo'].output.repoContentsUrl }}
+        repoContentsUrl: ${{ steps['publish-to-github'].output.repoContentsUrl }}
         catalogInfoPath: '/catalog-info.yaml'
 
   output:
     links:
       - title: View Repository
-        url: ${{ steps['push-to-repo'].output.remoteUrl }}
+        url: ${{ steps['publish-to-github'].output.remoteUrl }}
       - title: Open in Catalog
         icon: catalog
         entityRef: ${{ steps['register'].output.entityRef }}
