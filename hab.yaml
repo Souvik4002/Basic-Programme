@@ -40,27 +40,32 @@ spec:
           name: ${{ parameters.name }}
           email: ${{ parameters.email }}
 
-    - id: publish-to-github
-      name: Publish to GitHub
-      action: github:repo:push
+    - id: write-userdata-yaml
+      name: Create YAML with User Data
+      action: fs:write
+      input:
+        path: ./user-data.yaml
+        content: |
+          name: "${{ parameters.name }}"
+          email: "${{ parameters.email }}"
+          comments: "${{ parameters.comments }}"
+
+    - id: create-pull-request
+      name: Create Pull Request
+      action: github:pull-request:create
       input:
         repoUrl: github.com?owner=Souvik4002&repo=Basic-Programme
-        defaultBranch: main
+        branchName: feature/${{ parameters.name }}
+        title: "PR for ${{ parameters.name }}"
+        description: |
+          This PR was created automatically from Backstage for:
+          - **Name**: ${{ parameters.name }}
+          - **Email**: ${{ parameters.email }}
         sourcePath: "."
-        gitCommitMessage: ${{ parameters.comments }}
-        force: true
-
-    - id: register
-      name: Register Component
-      action: catalog:register
-      input:
-        repoContentsUrl: ${{ steps['publish-to-github'].output.repoContentsUrl }}
-        catalogInfoPath: '/catalog-info.yaml'
+        commitMessage: ${{ parameters.comments }}
+        targetBranch: main
 
   output:
     links:
-      - title: View Repository
-        url: ${{ steps['publish-to-github'].output.remoteUrl }}
-      - title: Open in Catalog
-        icon: catalog
-        entityRef: ${{ steps['register'].output.entityRef }}
+      - title: View Pull Request
+        url: ${{ steps['create-pull-request'].output.pullRequestUrl }}
